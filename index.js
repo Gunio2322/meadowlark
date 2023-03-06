@@ -40,14 +40,29 @@ const start = async () => {
     .then(() => console.log("database connected"))
     .catch((err) => console.log(err));
 
-  const BookResourceOptions = {
-    databases: [mongooseDB],
-    resource: Book 
-    
-  };
+    const BookResourceOptions = {
+      resource: Book,
+      options: {
+        actions: {
+          GetJsonData: {
+            actionType: "record",
+            component: false,
+            handler: (request, response, context) => {
+              const { record, currentAdmin } = context;
+              
+              console.log("record", record);
+              return {
+                record: record.toJSON(currentAdmin),
+                msg: "Hello world",
+              };
+            },
+          },
+        },
+      },
+    };
  
 
-  
+
 
   const adminOptions = {
     rootPath: "/admin",
@@ -73,6 +88,8 @@ const start = async () => {
     }
   );
   app.use(admin.options.rootPath, adminRouter)
+
+  component: AdminJS.bundle('./ShowRecord'),
 
 
   app.listen(PORT, () => {
